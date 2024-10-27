@@ -1,101 +1,130 @@
-import Image from "next/image";
+"use client";
+
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Crown, BookOpen } from "lucide-react";
+import { useState, useEffect } from "react";
+
+const quotes = [
+  {
+    text: "The only way to do great work is to love what you do. ",
+    author: "Steve Jobs",
+    explanation:
+      "This quote emphasizes the importance of passion in one's work. When you love your job, it doesn't feel like work, leading to greater creativity, dedication, and ultimately, better results.",
+  },
+  {
+    text: "Innovation distinguishes between a leader and a follower.",
+    author: "Steve Jobs",
+    explanation:
+      "This highlights the crucial role of innovation in leadership. Leaders are those who think differently and push boundaries, while followers simply adhere to established norms.",
+  },
+  {
+    text: "Stay hungry, stay foolish.",
+    author: "Steve Jobs",
+    explanation:
+      "This quote encourages continuous learning and risk-taking. 'Stay hungry' means always be eager to learn more, while 'stay foolish' suggests maintaining a willingness to take risks and think outside the box.",
+  },
+  {
+    text: "Your time is limited, don't waste it living someone else's life.",
+    author: "Steve Jobs",
+    explanation:
+      "This is a call to authenticity and following your own path. It reminds us that life is short and we should spend it pursuing our own dreams and values, not conforming to others' expectations.",
+  },
+  {
+    text: "Design is not just what it looks like and feels like. Design is how it works.",
+    author: "Steve Jobs",
+    explanation:
+      "This quote emphasizes that good design goes beyond aesthetics. It's about functionality, user experience, and how well something serves its purpose, not just its visual appeal.",
+  },
+];
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [currentQuote, setCurrentQuote] = useState(quotes[0]);
+  const [displayedText, setDisplayedText] = useState("");
+  const [index, setIndex] = useState(0);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  const generateQuote = () => {
+    let newQuote;
+    do {
+      newQuote = quotes[Math.floor(Math.random() * quotes.length)];
+    } while (newQuote === currentQuote);
+    setCurrentQuote(newQuote);
+    setDisplayedText("");
+    setIndex(0);
+  };
+
+  useEffect(() => {
+    if (index < currentQuote.text.length) {
+      const timer = setTimeout(() => {
+        setDisplayedText((prevText) => prevText + currentQuote.text[index]);
+        setIndex((prevIndex) => prevIndex + 1);
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [index, currentQuote.text]);
+
+  return (
+    <>
+      <style jsx global>{`
+        @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap");
+        body {
+          font-family: "Playfair Display", serif;
+          background-color: #000000;
+          color: #ffffff;
+        }
+      `}</style>
+      <div className="min-h-screen flex flex-col bg-black text-white">
+        <header className="py-4 bg-[#1a1a1a] border-b border-[#333333]">
+          <h1 className="text-2xl text-center">Timeless Wisdom</h1>
+        </header>
+        <main className="flex-grow flex flex-col items-center justify-center p-4 text-center">
+          <Crown className="w-12 h-12 sm:w-16 sm:h-16 mb-4 sm:mb-8 text-white" />
+          <blockquote className="mb-4 max-w-2xl relative px-4 sm:px-0">
+            <p className="text-2xl sm:text-4xl mb-2 leading-relaxed italic min-h-[100px] sm:min-h-[150px]">
+              &ldquo;{displayedText}&rdquo;
+            </p>
+            <footer className="text-lg sm:text-xl text-[#bdbdbd]">
+              - {currentQuote.author}
+            </footer>
+            <Dialog>
+              <DialogTrigger asChild>
+                <button 
+                  className="absolute -right-2 sm:-right-8 top-0 text-white hover:text-[#bdbdbd] transition-colors"
+                  aria-label="Show explanation"
+                >
+                  <BookOpen className="w-5 h-5 sm:w-6 sm:h-6" />
+                </button>
+              </DialogTrigger>
+              <DialogContent className="bg-[#1a1a1a] text-white border-[#333333] w-[90vw] max-w-lg sm:w-full">
+                <DialogHeader>
+                  <DialogTitle className="text-xl sm:text-2xl mb-4">Quote Explanation</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <blockquote className="text-lg sm:text-xl italic">&ldquo;{currentQuote.text}&rdquo;</blockquote>
+                  <p className="text-sm sm:text-base text-[#bdbdbd]">{currentQuote.explanation}</p>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </blockquote>
+
+          <Button
+            onClick={() => generateQuote()}
+            className="text-lg sm:text-xl py-4 sm:py-6 px-6 sm:px-8 bg-white text-black hover:bg-[#e0e0e0] transition-colors mb-4"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+            Generate New Quote
+          </Button>
+        </main>
+        <footer className="py-4 bg-[#1a1a1a] text-center text-xs sm:text-sm border-t border-[#333333] text-[#bdbdbd]">
+          &copy; {new Date().getFullYear()} Timeless Wisdom. All rights
+          reserved.
+        </footer>
+      </div>
+    </>
   );
 }
